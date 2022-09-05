@@ -43,7 +43,7 @@ def main():
     etiquetas = list()
 
     for marca in marcas:
-        etiquetas.append(f"{marca:,.1f}%")
+        etiquetas.append(f"{marca:,.0f}%")
 
     geojson = json.load(open("./mexico.json",  "r", encoding="utf-8"))
 
