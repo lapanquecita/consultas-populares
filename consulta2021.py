@@ -430,7 +430,7 @@ def create_bars():
         margin_t=90,
         margin_l=150,
         margin_r=40,
-        margin_b=70,
+        margin_b=80,
         title_font_size=26,
         paper_bgcolor="#082032",
         plot_bgcolor="#082032",
