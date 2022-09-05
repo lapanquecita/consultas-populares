@@ -102,7 +102,6 @@ def create_map():
     )
 
     fig.update_layout(
-        showlegend=False,
         font_family="Quicksand",
         font_color="#FFFFFF",
         margin={"r": 40, "t": 50, "l": 40, "b": 30},
@@ -266,7 +265,6 @@ def create_table():
     )
 
     fig.update_layout(
-        showlegend=False,
         width=1280,
         height=570,
         font_family="Quicksand",
@@ -305,7 +303,162 @@ def combine_images():
     result.paste(im=image2, box=(0, image1.height))
 
     # Guardamos la nueva imagen.
-    result.save("./2022.png")
+    result.save("./2022-1.png")
+
+
+
+def create_bars():
+    """
+    Esta función crea una gráfica de barras apiladas para
+    mostrar la distribución de las respuestas.
+    """
+
+    # Cargamos nuestro archivo JSON.
+    data = json.load(open("./data/2022.json", "r", encoding="utf-8"))
+
+    entidades = dict()
+
+    # Iteramos sobre todas las entidades.
+    for entidad in data["entidadesHijas"][:-1]:
+
+        # Limpiamos el nombre de la entidad.
+        nombre = entidad["nombreNodo"].title().replace("De", "de")
+
+        if nombre == "México":
+            nombre = "Estado de México"
+
+        # Extraemos los valores que nos interesa.
+        si = entidad["votacionPartidosConDistribucion"][0]["porcentaje"]
+        no = entidad["votacionPartidosConDistribucion"][1]["porcentaje"]
+        nulo = entidad["votacionPartidosConDistribucion"][2]["porcentaje"]
+
+        entidades[nombre] = [si, no, nulo]
+
+    # Creamos un DataFrame con los valores de nuestro diccionario.
+    df = pd.DataFrame.from_dict(
+        entidades, orient="index", columns=["si", "no", "nulo"])
+
+    # Redondeamos a dos decimales.
+    df = df.round(decimals=2)
+
+    # ordenamos por "SÍ" de mayor a menor.
+    df.sort_values("si", inplace=True)
+
+    # Vamos a crear 3 gráficas de barra apiladas.
+    # Una sera para "SÍ", otra para "NO" y la últim para votos nulos.
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Bar(
+            x=df["si"],
+            y=df.index,
+            text=df["si"],
+            textfont_color="white",
+            name="A favor",
+            orientation="h",
+            marker_color="#558b2f",
+            marker_line_width=0
+        )
+    )
+
+    fig.add_trace(
+        go.Bar(
+            x=df["no"],
+            y=df.index,
+            text=df["no"],
+            textfont_color="white",
+            name="En contra",
+            orientation="h",
+            marker_color="#ff5722",
+            marker_line_width=0
+        )
+    )
+
+    fig.add_trace(
+        go.Bar(
+            x=df["nulo"],
+            y=df.index,
+            text=df["nulo"],
+            textfont_color="white",
+            name="Nulos",
+            orientation="h",
+            marker_color="#9c27b0",
+            marker_line_width=0
+        )
+    )
+
+    fig.update_xaxes(
+        title="Proporción de la respuesta",
+        ticksuffix="%",
+        range=[0, 100],
+        ticks="outside",
+        ticklen=10,
+        zeroline=False,
+        title_standoff=15,
+        tickcolor="#FFFFFF",
+        linecolor="#FFFFFF",
+        linewidth=2,
+        nticks=11
+    )
+
+    fig.update_yaxes(
+        ticks="outside",
+        tickfont_size=14,
+        ticklen=10,
+        title_standoff=8,
+        tickcolor="#FFFFFF",
+        linewidth=2,
+        nticks=32
+    )
+
+    fig.update_layout(
+        showlegend=True,
+        legend_traceorder="normal",
+        legend_orientation="h",
+        legend_x=0.5,
+        legend_xanchor="center",
+        legend_y=1.045,
+        legend_yanchor="top",
+        barmode="stack",
+        width=1280,
+        height=1000,
+        font_family="Quicksand",
+        font_color="white",
+        font_size=14,
+        title_text="Distribución por entidad de las respuestas en la consulta popular del año 2022 en México",
+        title_x=0.5,
+        title_y=0.975,
+        margin_t=90,
+        margin_l=150,
+        margin_r=40,
+        margin_b=70,
+        title_font_size=26,
+        paper_bgcolor="#082032",
+        plot_bgcolor="#082032",
+        annotations=[
+            dict(
+                x=0.01,
+                y=-0.085,
+                xref="paper",
+                yref="paper",
+                xanchor="left",
+                yanchor="top",
+                text="Fuente: INE (2022)",
+            ),
+            dict(
+                x=1.01,
+                y=-0.085,
+                xref="paper",
+                yref="paper",
+                xanchor="right",
+                yanchor="top",
+                text="🧁 @lapanquecita",
+            )
+        ]
+    )
+
+    fig.write_image("./2022-2.png")
+
 
 
 if __name__ == "__main__":
@@ -313,3 +466,4 @@ if __name__ == "__main__":
     create_map()
     create_table()
     combine_images()
+    create_bars()

@@ -12,9 +12,13 @@ En este repositorio vamos a analizar los datos proporcionados por el INE.
 
 ## Consulta popular 2021
 
-![Imagen 1](./2021.png)
+![Imagen 1](./2021-1.png)
+
+![Imagen 2](./2021-2.png)
 
 ## Consulta popular 2022
 
 
-![Imagen 2](./2022.png)
+![Imagen 3](./2022-1.png)
+
+![Imagen 4](./2022-2.png)
