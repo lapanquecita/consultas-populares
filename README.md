@@ -10,11 +10,11 @@ Ambas consultas necesitan un mínimo del 40% de participación a nivel nacional 
 
 En este repositorio vamos a analizar los datos proporcionados por el INE.
 
-## Consulta Popular 2021
+## Consulta popular 2021
 
 ![Imagen 1](./2021.png)
 
-## Consulta Popular 2022
+## Consulta popular 2022
 
 
 ![Imagen 2](./2022.png)

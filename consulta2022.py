@@ -3,9 +3,15 @@ import json
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from PIL import Image
+from plotly.subplots import make_subplots
 
 
-def main():
+def create_map():
+    """
+    Esta función crea un mapa Choropleth con la información
+    de participación por entidad.
+    """
 
     # Cargamos nuestro archivo JSON.
     data = json.load(open("./data/2022.json", "r", encoding="utf-8"))
@@ -62,19 +68,37 @@ def main():
             z=valores,
             featureidkey="properties.ADMIN_NAME",
             colorscale="portland",
-            colorbar={"x": 0.03, "y": 0.5, "ypad": 50, "ticks": "outside", "outlinewidth": 2,
-                      "outlinecolor": "#FFFFFF", "tickvals": marcas, "ticktext": etiquetas,
-                      "tickwidth": 3, "tickcolor": "#FFFFFF", "ticklen": 10, "tickfont_size": 20},
+            colorbar=dict(
+                x=0.03,
+                y=0.5,
+                ypad=50,
+                ticks="outside",
+                outlinewidth=2,
+                outlinecolor="#FFFFFF",
+                tickvals=marcas,
+                ticktext=etiquetas,
+                tickwidth=3,
+                tickcolor="#FFFFFF",
+                ticklen=10,
+                tickfont_size=20
+            ),
             marker_line_color="white",
             marker_line_width=1.25,
-            zmin=9.0, zmax=36.0
+            zmin=9.0,
+            zmax=36.0
         )
     )
 
     fig.update_geos(
-        fitbounds="geojson", showocean=True, oceancolor="#082032",
-        showcountries=False, framecolor="#FFFFFF", framewidth=2,
-        showlakes=False, coastlinewidth=0, landcolor="#1C0A00"
+        fitbounds="geojson",
+        showocean=True,
+        oceancolor="#082032",
+        showcountries=False,
+        framecolor="#FFFFFF",
+        framewidth=2,
+        showlakes=False,
+        coastlinewidth=0,
+        landcolor="#1C0A00"
     )
 
     fig.update_layout(
@@ -130,9 +154,162 @@ def main():
         ]
     )
 
-    fig.write_image("./2022.png")
+    fig.write_image("./1.png")
+
+
+def create_table():
+    """
+    Esta función crea 2 tablas, cada una contiene
+    información de 16 entidades de México.
+    """
+
+    # Cargamos nuestro archivo JSON.
+    data = json.load(open("./data/2022.json", "r", encoding="utf-8"))
+
+    entidades = dict()
+
+    # Iteramos sobre todas las entidades.
+    for entidad in data["entidadesHijas"][:-1]:
+
+        # Limpiamos el nombre de la entidad.
+        nombre = entidad["nombreNodo"].title().replace("De", "de")
+
+        if nombre == "México":
+            nombre = "Estado de México"
+
+        # Extraemos los valores que nos interesa.
+        participacion = entidad["porcentajeParticipacionCiudadana"]
+        total_votos = entidad["totalVotos"]
+
+        entidades[nombre] = [participacion, total_votos]
+
+    # Creamos un DataFrame con los valores de nuestro diccionario.
+    df = pd.DataFrame.from_dict(
+        entidades, orient="index", columns=["participacion", "total"])
+
+    # ordenamos por participación de mayor a menor.
+    df.sort_values("participacion", ascending=False, inplace=True)
+
+    # Creamos un lienzo con dos subplots de tipo Table.
+    fig = make_subplots(
+        rows=1,
+        cols=2,
+        horizontal_spacing=0.03,
+        specs=[
+            [
+                {"type": "table"},
+                {"type": "table"}
+            ]
+        ]
+    )
+
+    # La primera tabla cubre las primers 16 entidades.
+    fig.add_trace(
+        go.Table(
+            columnwidth=[110, 80],
+            header=dict(
+                values=[
+                    "<b>Entidad</b>",
+                    "<b>Votos</b>",
+                    "<b>Participación ↓</b>"
+                ],
+                font_color="white",
+                fill_color="#ff5722",
+                align="center",
+                height=32,
+                line_width=0.8),
+            cells=dict(
+                values=[
+                    df.index[:16],
+                    df["total"][:16],
+                    df["participacion"][:16]
+                ],
+                fill_color="#082032",
+                height=32,
+                suffix=["", "", "%"],
+                format=["", ",", ".2f"],
+                line_width=0.8,
+                align=["left", "center"]
+            )
+        ), col=1, row=1
+    )
+
+    # La segunda tabla cubre las últimas 16 entidades.
+    fig.add_trace(
+        go.Table(
+            columnwidth=[110, 80],
+            header=dict(
+                values=[
+                    "<b>Entidad</b>",
+                    "<b>Votos</b>",
+                    "<b>Participación ↓</b>"
+                ],
+                font_color="white",
+                fill_color="#ff5722",
+                align="center",
+                height=32,
+                line_width=0.8),
+            cells=dict(
+                values=[
+                    df.index[16:],
+                    df["total"][16:],
+                    df["participacion"][16:]
+                ],
+                fill_color="#082032",
+                height=32,
+                suffix=["", "", "%"],
+                format=["", ",", ".2f"],
+                line_width=0.8,
+                align=["left", "center"]
+            )
+        ), col=2, row=1
+    )
+
+    fig.update_layout(
+        showlegend=False,
+        width=1280,
+        height=570,
+        font_family="Quicksand",
+        font_color="white",
+        font_size=20,
+        title="",
+        title_x=0.5,
+        title_y=0.95,
+        margin_t=0,
+        margin_l=40,
+        margin_r=40,
+        margin_b=0,
+        title_font_size=26,
+        paper_bgcolor="#334756"
+    )
+
+    fig.write_image("./2.png")
+
+
+def combine_images():
+    """
+    Esta función va a combianr nuestro mapa y tabla en una sola imagen.
+    """
+
+    # Cargamos las imágenes.
+    image1 = Image.open("./1.png")
+    image2 = Image.open("./2.png")
+
+    # Calculos el ancho y el alto de la nueva imagen.
+    result_width = image1.width
+    result_height = image1.height + image2.height
+
+    # Copiamos los pixeles de nuestras imágenes en nuestro nueov lienzo.
+    result = Image.new("RGB", (result_width, result_height))
+    result.paste(im=image1, box=(0, 0))
+    result.paste(im=image2, box=(0, image1.height))
+
+    # Guardamos la nueva imagen.
+    result.save("./2022.png")
 
 
 if __name__ == "__main__":
 
-    main()
+    create_map()
+    create_table()
+    combine_images()
