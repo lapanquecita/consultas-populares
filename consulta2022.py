@@ -55,7 +55,7 @@ def create_map():
 
     # Iteramos sobre las entidades dentro del GeoJSON.
     for item in geojson["features"]:
-        geo = item["properties"]["ADMIN_NAME"]
+        geo = item["properties"]["NOM_ENT"]
         ubicaciones.append(geo)
         valores.append(df.loc[geo, "participacion"])
 
@@ -66,7 +66,7 @@ def create_map():
             geojson=geojson,
             locations=ubicaciones,
             z=valores,
-            featureidkey="properties.ADMIN_NAME",
+            featureidkey="properties.NOM_ENT",
             colorscale="portland",
             colorbar=dict(
                 x=0.03,
@@ -82,8 +82,8 @@ def create_map():
                 ticklen=10,
                 tickfont_size=20
             ),
-            marker_line_color="white",
-            marker_line_width=1.25,
+            marker_line_color="#FFFFFF",
+            marker_line_width=1.0,
             zmin=9.0,
             zmax=36.0
         )
@@ -212,7 +212,7 @@ def create_table():
                     "<b>Votos</b>",
                     "<b>Participación ↓</b>"
                 ],
-                font_color="white",
+                font_color="#FFFFFF",
                 fill_color="#ff5722",
                 align="center",
                 height=32,
@@ -243,7 +243,7 @@ def create_table():
                     "<b>Votos</b>",
                     "<b>Participación ↓</b>"
                 ],
-                font_color="white",
+                font_color="#FFFFFF",
                 fill_color="#ff5722",
                 align="center",
                 height=32,
@@ -268,7 +268,7 @@ def create_table():
         width=1280,
         height=570,
         font_family="Quicksand",
-        font_color="white",
+        font_color="#FFFFFF",
         font_size=20,
         title="",
         title_x=0.5,
@@ -353,7 +353,7 @@ def create_bars():
             x=df["si"],
             y=df.index,
             text=df["si"],
-            textfont_color="white",
+            textfont_color="#FFFFFF",
             name="A favor",
             orientation="h",
             marker_color="#558b2f",
@@ -366,7 +366,7 @@ def create_bars():
             x=df["no"],
             y=df.index,
             text=df["no"],
-            textfont_color="white",
+            textfont_color="#FFFFFF",
             name="En contra",
             orientation="h",
             marker_color="#ff5722",
@@ -379,7 +379,7 @@ def create_bars():
             x=df["nulo"],
             y=df.index,
             text=df["nulo"],
-            textfont_color="white",
+            textfont_color="#FFFFFF",
             name="Nulos",
             orientation="h",
             marker_color="#9c27b0",
@@ -423,7 +423,7 @@ def create_bars():
         width=1280,
         height=1000,
         font_family="Quicksand",
-        font_color="white",
+        font_color="#FFFFFF",
         font_size=14,
         title_text="Distribución por entidad de las respuestas en la consulta popular del año 2022 en México",
         title_x=0.5,
